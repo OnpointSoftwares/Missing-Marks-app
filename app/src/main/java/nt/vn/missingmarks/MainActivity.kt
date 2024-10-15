@@ -11,6 +11,10 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,7 +29,30 @@ class MainActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
 if(auth.uid != "")
 {
-    startActivity(Intent(this, MainActivity2::class.java))
+    FirebaseDatabase.getInstance().reference.child("users").child(auth.uid.toString()).addValueEventListener(object:ValueEventListener{
+        override fun onDataChange(snapshot: DataSnapshot) {
+            if(snapshot.value=="student")
+            {
+                startActivity(Intent(this@MainActivity, StudentPanel::class.java))
+                Toast.makeText(this@MainActivity,"Student",Toast.LENGTH_LONG).show()
+            }
+            else if(snapshot.value=="lecturer")
+            {
+                Toast.makeText(this@MainActivity,"Lecturer",Toast.LENGTH_LONG).show()
+            }
+            else if(snapshot.value=="admin")
+            {
+                startActivity(Intent(this@MainActivity, MainActivity2::class.java))
+                finish()
+            }
+
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+
+        }
+
+    })
 }
         // Get references to UI elements
         val emailEditText = findViewById<EditText>(R.id.emailField)
@@ -59,8 +86,31 @@ if(auth.uid != "")
                     val user = auth.currentUser
                     Toast.makeText(this, "Login successful: ${user?.email}", Toast.LENGTH_SHORT).show()
                     findViewById<ProgressBar>(R.id.progress).visibility= View.GONE
-                    startActivity(Intent(this, MainActivity2::class.java))
-                    finish() // Prevent going back to the login screen
+                   FirebaseDatabase.getInstance().reference.child("users").child(user!!.uid).addValueEventListener(object:ValueEventListener{
+                       override fun onDataChange(snapshot: DataSnapshot) {
+                           if(snapshot.value=="student")
+                           {
+                               startActivity(Intent(this@MainActivity, StudentPanel::class.java))
+                               Toast.makeText(this@MainActivity,"Student",Toast.LENGTH_LONG).show()
+                           }
+                           else if(snapshot.value=="lecturer")
+                           {
+                               Toast.makeText(this@MainActivity,"Lecturer",Toast.LENGTH_LONG).show()
+                           }
+                           else if(snapshot.value=="admin")
+                           {
+                               startActivity(Intent(this@MainActivity, MainActivity2::class.java))
+                               finish()
+                           }
+
+                       }
+
+                       override fun onCancelled(error: DatabaseError) {
+
+                       }
+
+                   })
+                    // Prevent going back to the login screen
                 } else {
                     // Login failed, display error message
                     Log.e("LoginActivity", "Login failed", task.exception)

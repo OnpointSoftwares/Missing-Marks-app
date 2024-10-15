@@ -12,7 +12,7 @@
         android:id="@+id/navigation_students"
         android:icon="@drawable/ic_students"
         />
-    <item android:title="Missing marks"
+    <item android:title="Courses"
         android:id="@+id/navigation_missing_marks"
         android:icon="@drawable/marks"
         />

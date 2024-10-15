@@ -67,25 +67,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/studentGender"/>
-    <Button
-        android:id="@+id/view_marks"
-        android:backgroundTint="@color/primaryColor"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        app:layout_constraintTop_toBottomOf="@id/studentEmail"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="View Marks"
-        />
-    <Button
-        android:id="@+id/view_courses"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_width="wrap_content"
-        android:backgroundTint="@color/primaryColor"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/view_marks"
-        android:layout_marginTop="20dp"
-        android:text="View Courses"
-        />
+        >
+        <Button
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="20dp"
+            android:id="@+id/view_marks"
+            android:backgroundTint="@color/primaryColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View Marks"
+            />
+        <Button
+            android:id="@+id/view_courses"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:backgroundTint="@color/primaryColor"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="View Courses"
+            />
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,8 +9,7 @@ import nt.vn.missingmarks.R
 import nt.vn.missingmarks.models.Course
 
 class CourseAdapter(
-    private val courses: List<Course>,
-    private val onCourseClick: (Course) -> Unit
+    private val courses: List<Course>
 ) : RecyclerView.Adapter<CourseAdapter.CourseViewHolder>() {
 
     inner class CourseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -18,7 +17,7 @@ class CourseAdapter(
 
         fun bind(course: Course) {
             courseNameTextView.text = course.courseName
-            itemView.setOnClickListener { onCourseClick(course) }
+            itemView.setOnClickListener { }
         }
     }
 

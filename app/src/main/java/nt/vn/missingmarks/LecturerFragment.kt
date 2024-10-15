@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import nt.vn.missingmarks.adapters.LecturerAdapter
 import nt.vn.missingmarks.models.Course
@@ -50,8 +51,8 @@ class LecturerFragment : Fragment() {
     }
 
     private fun showAddLecturerDialog() {
-        // Create a dialog to add lecturer
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_lecturer, null)
+        val dialogView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_lecturer, null)
         val builder = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setTitle("Add New Lecturer")
@@ -61,39 +62,71 @@ class LecturerFragment : Fragment() {
         // Get references to the input fields in the dialog
         val editTextLecturerId = dialogView.findViewById<EditText>(R.id.editTextLecturerId)
         val editTextLecturerName = dialogView.findViewById<EditText>(R.id.editTextLecturerName)
-        val editTextLecturerCourses = dialogView.findViewById<EditText>(R.id.editTextLecturerCourses)
+        val editTextLecturerDepartment =
+            dialogView.findViewById<EditText>(R.id.editTextLecturerDepartment)
+        val editTextLecturerEmail = dialogView.findViewById<EditText>(R.id.editTextLecturerEmail)
+        val editTextLecturerOfficeHours =
+            dialogView.findViewById<EditText>(R.id.editTextLecturerOfficeHours)
+        val editTextLecturerCourses =
+            dialogView.findViewById<EditText>(R.id.editTextLecturerCourses)
         val submitButton = dialogView.findViewById<Button>(R.id.buttonSubmitLecturer)
 
         // Handle form submission
         submitButton.setOnClickListener {
             val lecturerId = editTextLecturerId.text.toString()
             val name = editTextLecturerName.text.toString()
+            val department = editTextLecturerDepartment.text.toString()
+            val email = editTextLecturerEmail.text.toString()
+            val officeHours = editTextLecturerOfficeHours.text.toString()
             val coursesInput = editTextLecturerCourses.text.toString()
+
+            // Parse the courses input
             val courses = coursesInput.split(",").map { courseName ->
                 Course(courseId = "", courseName = courseName.trim())
             }.filter { it.courseName.isNotEmpty() }
 
-            if (lecturerId.isNotEmpty() && name.isNotEmpty()) {
-                // Create new lecturer object
+            if (lecturerId.isNotEmpty() && name.isNotEmpty() && department.isNotEmpty() && email.isNotEmpty()) {
+                // Create new lecturer object with new fields
                 val newLecturer = Lecturer(
                     lecturerId = lecturerId,
                     name = name,
+                    department = department,
+                    email = email,
+                    officeHours = officeHours,
                     courses = courses
                 )
-
+                val database = FirebaseDatabase.getInstance().reference
                 // Add new lecturer to Firebase
                 val key = database.push().key.toString()
-                database.child(key).setValue(newLecturer).addOnCompleteListener {
-                    Toast.makeText(requireContext(), "Lecturer added", Toast.LENGTH_LONG).show()
+                database.child("lecturers").child(key).setValue(newLecturer).addOnCompleteListener {
+                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(newLecturer.email,"lecturer123").addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            FirebaseDatabase.getInstance().reference.child("users").child(it.result.user!!.uid).setValue("lecturer").addOnCompleteListener {
+                                Toast.makeText(requireContext(), "Lecturer added", Toast.LENGTH_LONG).show()
+                            }
+
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "Failed to add lecturer",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+
                 }
 
                 // Dismiss the dialog
                 alertDialog.dismiss()
             } else {
-                Toast.makeText(context, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Please fill in all required fields",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
-    }
+}
 
     private fun fetchLecturersFromFirebase() {
         database.addValueEventListener(object : ValueEventListener {

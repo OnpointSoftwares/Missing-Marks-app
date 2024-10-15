@@ -11,6 +11,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Course Name"
+        android:padding="10dp"
+        android:background="@drawable/shape_round"
         android:textSize="18sp"
         android:textColor="@android:color/black"
         app:layout_constraintStart_toStartOf="parent"

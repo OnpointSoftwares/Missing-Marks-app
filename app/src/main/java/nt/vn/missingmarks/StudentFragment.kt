@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import nt.vn.missingmarks.adapters.StudentAdapter
 import nt.vn.missingmarks.models.Course
@@ -94,7 +95,20 @@ class StudentFragment : Fragment() {
                 // Add new student to Firebase
                 val key = database.push().key.toString()
                 database.child(key).setValue(newStudent).addOnCompleteListener {
-                    Toast.makeText(requireContext(), "Student added", Toast.LENGTH_LONG).show()
+                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(newStudent.email,"student123").addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            FirebaseDatabase.getInstance().reference.child("users")
+                                .child(it.result.user!!.uid).setValue("student")
+                                .addOnCompleteListener {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "Lecturer added",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                        }
+                    }
+
                 }
 
                 // Dismiss the dialog
